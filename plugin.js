@@ -7,6 +7,7 @@
  * Logs information on the console when removing, merging etc.
  *
  * @author pr0nbaer
+ * @version 0.0.2
  */
 (function() {
     // Plugin registrieren
