@@ -3,11 +3,25 @@ Plugin for CKEditor
 
 http://ckeditor.com
 
-Plugin Purpose
-===============
+About
+-----------------
 Plugin ```webkit-span-fix``` been created to fix bug, which appears when merging paragraphs in CKEditor with delete/backspace.
 
-Bug description
+Basic Information:
+-----------------
+
+* Webkit will insert/update span Elements in the short time when the keyDown and the keyUp event is triggered
+* Webkit updates ALL Elements within the last block element that is being merged within another (Block Elements are all element with display:block as computed style
+
+What plugin does:
+-----------------
+
+* When the keyDown event is fired, all Element- or text-nodes-siblings directly after the selection (or cursor) within (direct children, not children-chilren..) the last merged block element are saved in an array -> They are not affected at this time of the webkit-span-update
+* Directly after the keyDown event, the keyUp event is bound to the editor once. When the keyUp event is fired (and webkit has already updated the spans) the same thing as in step 1 will be done with the new selection, and all siblings are saved to another array
+* Before the fix will start to replace or remove Elements from the array of step 1 with the array of step 2, it will find out if 2 block elements have been merged when the whole keypress is done
+* If so, a difference is being created from the step1-array and step2-array. If a element in the step2-array is a span, but the element on the same index in the step1-array is not a span, the span will be removed and replaced with its contents; if a element in the step2-array is a span with styles in the style-attribute, and the element on the same index in the step1-array is also a span with style-attribute, but the style differs, the style-Element is being copied from the step1-array-element to the step2-array-element.
+
+Full Bug description
 ---------------
 Original: [http://dev.ckeditor.com/ticket/9998](http://dev.ckeditor.com/ticket/9998?cversion=1&cnum_hist=45#comment:45)
 
