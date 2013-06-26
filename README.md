@@ -32,6 +32,7 @@ line2</p>
 ```html
 <p><br />
 line2</p>
+```
 
 > and
 
