@@ -1,5 +1,5 @@
 /**
- * Pplugin to fix this issue in webkit browsers
+ * Plugin to fix this issue in webkit browsers
  * Bug description http://dev.ckeditor.com/ticket/9998
 
  * It removes spans created by webkit browsers
@@ -152,18 +152,32 @@
 
                                     nodeBeforeKey = nextNodeSiblingsOnKeyDown.siblings[i];
                                     nodeAfterKey = nextNodeSiblingsOnKeyUp.siblings[i];
-
+                                    
                                     // Textknoten wurde in einen Span umgewandelt
                                     if (nodeBeforeKey instanceof CKEDITOR.dom.text && nodeAfterKey instanceof CKEDITOR.dom.element && nodeAfterKey.getName() == 'span') {
 
                                         console.log('>>> Remove Webkit Span', nodeAfterKey.getOuterHtml());
                                         nodeAfterKey.remove(true);
 
-                                        // In einem Span Element wurde das Style-Attribut geändert
-                                    } else if (nodeBeforeKey instanceof CKEDITOR.dom.element && nodeBeforeKey.getName() == 'span' && nodeAfterKey instanceof CKEDITOR.dom.element && nodeAfterKey.getName() == 'span' && nodeAfterKey.getAttribute('style') != nodeBeforeKey.getAttribute('style')) {
+                                    // In einem Inline-Element wurde das Style-Attribut geändert
+                                    } else if (nodeBeforeKey instanceof CKEDITOR.dom.element
+                                            && nodeAfterKey.getComputedStyle('display').match(/^inline/)
+                                            && nodeAfterKey instanceof CKEDITOR.dom.element
+                                            && nodeAfterKey.getName() == nodeBeforeKey.getName()
+                                            && nodeAfterKey.getAttribute('style') != nodeBeforeKey.getAttribute('style')) {
 
-                                        console.log('>>> Update Webkit Span Style Attribute', nodeAfterKey.getOuterHtml(), 'to', nodeBeforeKey.getAttribute('style'));
-                                        nodeAfterKey.setAttribute('style', nodeBeforeKey.getAttribute('style'));
+                                        if ( nodeBeforeKey.getAttribute('style') != null ) {
+
+                                            console.log('>>> Update Webkit Span Style Attribute', nodeAfterKey.getOuterHtml(), 'to', nodeBeforeKey.getAttribute('style'));
+                                            nodeAfterKey.setAttribute('style', nodeBeforeKey.getAttribute('style'));
+                                   
+                                        } else {
+                                            
+                                            console.log('>>> Remove Webkit Span Style Attribute', nodeAfterKey.getOuterHtml());
+                                            nodeAfterKey.removeAttribute('style');
+                                            
+                                        }
+                                        
                                     }
                                     // Bugfix => Selektion wiederherstellen
                                     nextNodeSiblingsOnKeyUp.redoSelection();
