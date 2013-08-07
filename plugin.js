@@ -152,7 +152,7 @@
 
                                     nodeBeforeKey = nextNodeSiblingsOnKeyDown.siblings[i];
                                     nodeAfterKey = nextNodeSiblingsOnKeyUp.siblings[i];
-                                    
+
                                     // Textknoten wurde in einen Span umgewandelt
                                     if (nodeBeforeKey instanceof CKEDITOR.dom.text && nodeAfterKey instanceof CKEDITOR.dom.element && nodeAfterKey.getName() == 'span') {
 
@@ -161,6 +161,7 @@
 
                                     // In einem Inline-Element wurde das Style-Attribut geändert
                                     } else if (nodeBeforeKey instanceof CKEDITOR.dom.element
+                                            && nodeAfterKey instanceof CKEDITOR.dom.element
                                             && nodeAfterKey.getComputedStyle('display').match(/^inline/)
                                             && nodeAfterKey instanceof CKEDITOR.dom.element
                                             && nodeAfterKey.getName() == nodeBeforeKey.getName()
@@ -170,14 +171,14 @@
 
                                             console.log('>>> Update Webkit Span Style Attribute', nodeAfterKey.getOuterHtml(), 'to', nodeBeforeKey.getAttribute('style'));
                                             nodeAfterKey.setAttribute('style', nodeBeforeKey.getAttribute('style'));
-                                   
+
                                         } else {
-                                            
+
                                             console.log('>>> Remove Webkit Span Style Attribute', nodeAfterKey.getOuterHtml());
                                             nodeAfterKey.removeAttribute('style');
-                                            
+
                                         }
-                                        
+
                                     }
                                     // Bugfix => Selektion wiederherstellen
                                     nextNodeSiblingsOnKeyUp.redoSelection();
