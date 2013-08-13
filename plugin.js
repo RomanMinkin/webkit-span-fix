@@ -7,7 +7,7 @@
  * Logs information on the console when removing, merging etc.
  *
  * @author pr0nbaer
- * @version 0.0.2
+ * @version 0.0.3
  */
 (function() {
     // Plugin registrieren
@@ -150,18 +150,20 @@
 
                                     if (nextNodeSiblingsOnKeyUp.siblings[i] === undefined) break;
 
-                                    nodeBeforeKey = nextNodeSiblingsOnKeyDown.siblings[i];
-                                    nodeAfterKey = nextNodeSiblingsOnKeyUp.siblings[i];
-
+                                    var nodeBeforeKey = nextNodeSiblingsOnKeyDown.siblings[i];
+                                    var nodeAfterKey = nextNodeSiblingsOnKeyUp.siblings[i];
+                                    
                                     // Textknoten wurde in einen Span umgewandelt
-                                    if (nodeBeforeKey instanceof CKEDITOR.dom.text && nodeAfterKey instanceof CKEDITOR.dom.element && nodeAfterKey.getName() == 'span') {
-
+                                    if ((nodeBeforeKey instanceof CKEDITOR.dom.text 
+                                        || nodeAfterKey instanceof CKEDITOR.dom.element) 
+                                        && (typeof nodeAfterKey.getName != 'undefined' 
+                                        && nodeAfterKey.getName() == 'span')) {
+                                        
                                         console.log('>>> Remove Webkit Span', nodeAfterKey.getOuterHtml());
                                         nodeAfterKey.remove(true);
 
                                     // In einem Inline-Element wurde das Style-Attribut geändert
                                     } else if (nodeBeforeKey instanceof CKEDITOR.dom.element
-                                            && nodeAfterKey instanceof CKEDITOR.dom.element
                                             && nodeAfterKey.getComputedStyle('display').match(/^inline/)
                                             && nodeAfterKey instanceof CKEDITOR.dom.element
                                             && nodeAfterKey.getName() == nodeBeforeKey.getName()
@@ -171,14 +173,14 @@
 
                                             console.log('>>> Update Webkit Span Style Attribute', nodeAfterKey.getOuterHtml(), 'to', nodeBeforeKey.getAttribute('style'));
                                             nodeAfterKey.setAttribute('style', nodeBeforeKey.getAttribute('style'));
-
+                                   
                                         } else {
-
+                                            
                                             console.log('>>> Remove Webkit Span Style Attribute', nodeAfterKey.getOuterHtml());
                                             nodeAfterKey.removeAttribute('style');
-
+                                            
                                         }
-
+                                        
                                     }
                                     // Bugfix => Selektion wiederherstellen
                                     nextNodeSiblingsOnKeyUp.redoSelection();
