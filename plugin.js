@@ -51,7 +51,7 @@
                 };
 
                 var getNextNodeSiblingsOfSelection = function() {
-                    // return array
+                    // the return array
                     var siblings  = [];
                     // get selection
                     var selection = editor.getSelection();
