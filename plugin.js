@@ -10,16 +10,16 @@
  * @version 0.0.2
  */
 (function() {
-    // Plugin registrieren
+    // register plugin
     CKEDITOR.plugins.add('webkit-span-fix', {
-        // Plugin initialisiert
+        // initialize plugin
         init: function(editor) {
 
             ////////////////////////////////////////////////////////////////////////
             // Webkit Span Bugfix //////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////
 
-            // Nur für Webkit Browser
+            // only for Webkit browsers
             if (CKEDITOR.env.webkit) {
 
                 console.log('>>> Using Webkit Span Bugfix');
@@ -29,19 +29,18 @@
                     var parents;
 
                     if (node instanceof CKEDITOR.dom.element || node instanceof CKEDITOR.dom.text) {
-                        // Alle Elternknoten des Knotens holen (inkl. des Knotens selbst)
+                        // get all parent nodes of the node (including the node itself)
                         parents = node.getParents(true);
 
-                        // Wenn Elternknoten vorhanden
+                        // if parent nodes exist
                         if (parents !== null) {
 
-                            // Elternelementse durchschleifen
+                            // loop over parent nodes
                             for (var i = 0; i < parents.length; i++) {
 
                                 parentsToBlockElement[i] = parents[i];
 
-                                // Wenn Elternelement ein Blockelement, dann das vorherige
-                                // Elternelement wegspeichern und abbrechen
+                                // if the current parent element has block display, then hold on to the previous parent element and break
                                 if (i >= 1 && parents[i] instanceof CKEDITOR.dom.element && parents[i].getComputedStyle('display') == 'block') {
                                     break;
                                 }
@@ -52,38 +51,37 @@
                 };
 
                 var getNextNodeSiblingsOfSelection = function() {
-                    // Rückgabearray
+                    // the return array
                     var siblings  = [];
-                    // Selektion holen
+                    // get selection
                     var selection = editor.getSelection();
                     var nextNode;
                     var ranges;
                     var nextNodeParents;
                     var element;
 
-                    // Wenn Selektion vorhanden
+                    // if selection exists
                     if (selection !== null) {
 
-                        // Ranges der Selektion holen
+                        // get selection ranges
                         ranges = selection.getRanges();
 
-                        // Wenn Ranges vorhanden
+                        // if ranges exist
                         if (ranges.length) {
 
                             nextNode = ranges[0].getNextNode();
 
-                            // Wenn Knoten vorhanden
+                            // if node exists
                             if (nextNode !== null) {
 
                                 nextNodeParents = getParentsToClosestBlockElement(nextNode);
 
-                                // Wenn Element vorhanden
+                                // if element exists
                                 if (nextNodeParents[nextNodeParents.length - 2] !== undefined) {
 
                                     element = nextNodeParents[nextNodeParents.length - 2];
 
-                                    // Das Element und alle seine nachfolgenden Elemente (in der gleichen Ebene)
-                                    // wegspeichern
+                                    // hold on to the element and all of its siblings
                                     do {
 
                                         siblings.push(element);
@@ -113,16 +111,16 @@
 
                 };
 
-                // Wenn Editor im Editierungsmodus ist (WYSIWYG Modus)
+                // if editor is in edit-mode
                 editor.on('contentDom', function() {
 
-                    // Wenn KeyDown Event getriggert wurde
+                    // if keydown event was triggered
                     editor.document.on('keydown', function(event) {
 
                         var nextNodeSiblingsOnKeyDown = getNextNodeSiblingsOfSelection();
 
-                        // Einmalig beim keyDown Event das KeyUp Event binden
-                        // => Wird dann aufgerufen, nachdem Chrome die SPANs gesetzt hat! ;)
+                        // bind keyDown event on keyUp once
+                        // => will be called after Chrome sets SPAN elements! ;)
                         editor.document.once('keyup', function(event) {
 
                             var nextNodeSiblingsOnKeyUp = getNextNodeSiblingsOfSelection();
@@ -153,13 +151,13 @@
                                     nodeBeforeKey = nextNodeSiblingsOnKeyDown.siblings[i];
                                     nodeAfterKey = nextNodeSiblingsOnKeyUp.siblings[i];
 
-                                    // Textknoten wurde in einen Span umgewandelt
+                                    // convert text node to SPAN element
                                     if (nodeBeforeKey instanceof CKEDITOR.dom.text && nodeAfterKey instanceof CKEDITOR.dom.element && nodeAfterKey.getName() == 'span') {
 
                                         console.log('>>> Remove Webkit Span', nodeAfterKey.getOuterHtml());
                                         nodeAfterKey.remove(true);
 
-                                    // In einem Inline-Element wurde das Style-Attribut geändert
+                                    // modify style attribute of inline element
                                     } else if (nodeBeforeKey instanceof CKEDITOR.dom.element
                                             && nodeAfterKey instanceof CKEDITOR.dom.element
                                             && nodeAfterKey.getComputedStyle('display').match(/^inline/)
@@ -180,7 +178,7 @@
                                         }
 
                                     }
-                                    // Bugfix => Selektion wiederherstellen
+                                    // Bugfix => restore selection
                                     nextNodeSiblingsOnKeyUp.redoSelection();
                                 }
                             }
